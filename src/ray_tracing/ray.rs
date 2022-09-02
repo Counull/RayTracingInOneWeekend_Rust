@@ -1,11 +1,11 @@
 use crate::math_f64::vec3::{Point3, Vec3};
 
+use super::camera::{self, Camera};
 
 pub struct Ray {
     pub orig: Point3,
     pub dir: Vec3,
 }
-
 
 ///Constructor
 impl Ray {
@@ -24,6 +24,17 @@ impl Ray {
         Ray {
             orig: Point3::from_array(origin),
             dir: Vec3::from_array(direct),
+        }
+    }
+    pub fn from_camera(camera: &Camera, screen_coord: Vec3) -> Ray {
+        Ray {
+            orig: camera.origin,
+            dir: Vec3::unit_vector(
+                camera.lower_left_corner
+                    + screen_coord.x() * camera.horizontal
+                    + screen_coord.y() * camera.vertical
+                    - camera.origin,
+            ),
         }
     }
 }

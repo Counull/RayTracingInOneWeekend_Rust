@@ -1,12 +1,13 @@
 use crate::math_f64::vec3::Vec3;
 
-
 pub struct Camera {
     pub width: f64,
     pub height: f64,
     pub aspect_retio: f64,
     pub focal_lehgth: f64,
     pub origin: Vec3,
+    pub horizontal: Vec3,
+    pub vertical: Vec3,
     pub lower_left_corner: Vec3,
 }
 ///Constructor
@@ -40,7 +41,10 @@ impl Camera {
             aspect_retio,
             focal_lehgth,
             origin: orig,
+            horizontal,
+            vertical,
             lower_left_corner,
+           
         }
     }
 }

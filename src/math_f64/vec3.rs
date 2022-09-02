@@ -39,10 +39,10 @@ impl Mul<f64> for Vec3 {
     }
 }
 
-impl  Mul<Vec3> for f64 {
-    type Output =   Vec3;
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
     fn mul(self, rhs: Vec3) -> Vec3 {
-        rhs*self
+        rhs * self
     }
 }
 
@@ -57,14 +57,12 @@ impl Div<f64> for Vec3 {
     }
 }
 
-impl Div<Vec3> for f64{
+impl Div<Vec3> for f64 {
     type Output = Vec3;
     fn div(self, rhs: Vec3) -> Self::Output {
-        rhs/self
+        rhs / self
     }
 }
-
-
 
 ///Constructor
 impl Vec3 {
@@ -77,7 +75,7 @@ impl Vec3 {
 }
 
 ///Get value
-impl  Vec3 {
+impl Vec3 {
     pub fn x(&self) -> f64 {
         self.e[0]
     }
@@ -93,6 +91,15 @@ impl  Vec3 {
 
 ///Func
 impl Vec3 {
+    pub fn to_r8g8b8_string(&self) -> String {
+        format!(
+            "{} {} {}\n",
+            (255.999 *self.x()) as i32,
+            (255.999 *self.y()) as i32,
+            (255.999 *self.z()) as i32
+        )
+    }
+
     pub fn length_squared(&self) -> f64 {
         return self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2];
     }
@@ -115,7 +122,6 @@ impl Vec3 {
         ])
     }
 }
-
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;
