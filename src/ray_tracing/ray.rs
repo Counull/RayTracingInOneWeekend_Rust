@@ -26,13 +26,19 @@ impl Ray {
             dir: Vec3::from_array(direct),
         }
     }
+
+    ///Generate ray from camera to screen coordinate
+    ///program screen_coord: just use .x() and .y()
     pub fn from_camera(camera: &Camera, screen_coord: Vec3) -> Ray {
         Ray {
             orig: camera.origin,
             dir: Vec3::unit_vector(
                 camera.lower_left_corner
-                    + screen_coord.x() * camera.horizontal
-                    + screen_coord.y() * camera.vertical
+                    + Vec3::from_array([
+                        screen_coord.x() * camera.width,
+                        screen_coord.y() * camera.height,
+                        0.0,
+                    ])
                     - camera.origin,
             ),
         }
