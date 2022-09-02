@@ -39,6 +39,13 @@ impl Mul<f64> for Vec3 {
     }
 }
 
+impl  Mul<Vec3> for f64 {
+    type Output =   Vec3;
+    fn mul(self, rhs: Vec3) -> Vec3 {
+        rhs*self
+    }
+}
+
 impl Div<f64> for Vec3 {
     type Output = Self;
 
@@ -50,15 +57,27 @@ impl Div<f64> for Vec3 {
     }
 }
 
+impl Div<Vec3> for f64{
+    type Output = Vec3;
+    fn div(self, rhs: Vec3) -> Self::Output {
+        rhs/self
+    }
+}
+
+
+
+///Constructor
 impl Vec3 {
-    /// Creates a new [`Vec3`].
     pub fn new() -> Vec3 {
         return Vec3 { e: [0.0; 3] };
     }
     pub fn from_array(array: [f64; 3]) -> Vec3 {
         return Vec3 { e: array };
     }
+}
 
+///Get value
+impl  Vec3 {
     pub fn x(&self) -> f64 {
         self.e[0]
     }
@@ -70,7 +89,10 @@ impl Vec3 {
     pub fn z(&self) -> f64 {
         self.e[2]
     }
+}
 
+///Func
+impl Vec3 {
     pub fn length_squared(&self) -> f64 {
         return self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2];
     }
@@ -93,5 +115,7 @@ impl Vec3 {
         ])
     }
 }
+
+
 pub type Color = Vec3;
 pub type Point3 = Vec3;
