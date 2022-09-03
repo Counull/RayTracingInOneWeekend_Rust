@@ -1,14 +1,39 @@
 mod math_f64;
 mod ray_tracing;
 mod utils;
+
 use ray_tracing::{camera::Camera, image::Image, ray::Ray};
 use utils::file_utils::file_write;
 
-use math_f64::vec3::{Color, Vec3};
+use math_f64::vec3::{Color, Point3, Vec3};
 
 fn ray_color(r: Ray) -> Color {
-    let t = 0.5 * (r.dir.y() + 1.0);
+    let t = hit_sphere(&Point3::from_array([0.0, 0.0, -1.0]), 0.5, &r);
+    if (t > 0.0) {
+        let N = Vec3::unit_vector(r.at(t) - Vec3::from_array([0.0, 0.0, -1.0]));
+        return 0.5 * Color::from_array([N.x() + 1.0, N.y() + 1.0, N.z() + 1.0]);
+    }
+
+   let t=0.5 * (r.dir.y()+1.0); 
+
     (1.0 - t) * Color::from_array([1.0, 1.0, 1.0]) + t * Color::from_array([0.5, 0.7, 1.0])
+}
+
+//实际上就是求一元二次方程是否有解
+fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
+    let oc = ray.origin() - *center; //预先计算（A-C）
+
+    //b^2-4ac
+    let a = Vec3::dot(ray.dir, ray.dir);
+    let b = Vec3::dot(ray.dir, oc) * 2.0;
+    let c = Vec3::dot(oc, oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c; //b^2-4ac
+
+    if discriminant < 0.0 {
+        return -1.0;
+    }
+
+    return (-b - discriminant.sqrt()) / 2.0 * a;
 }
 
 fn main() {
