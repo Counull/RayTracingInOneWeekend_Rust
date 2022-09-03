@@ -1,6 +1,5 @@
+use super::camera::Camera;
 use crate::math_f64::vec3::{Point3, Vec3};
-
-use super::camera::{self, Camera};
 
 pub struct Ray {
     pub orig: Point3,
@@ -9,21 +8,14 @@ pub struct Ray {
 
 ///Constructor
 impl Ray {
-    pub fn new() -> Ray {
-        Ray {
-            orig: Point3::new(),
-            dir: Vec3::new(),
-        }
-    }
-
-    pub fn from_vec3(orig: Point3, dir: Vec3) -> Ray {
-        Ray { orig, dir }
+    pub fn new(orig: Point3, dir: Vec3) -> Self {
+        Self { orig, dir }
     }
 
     pub fn from_array(origin: [f64; 3], direct: [f64; 3]) -> Ray {
         Ray {
-            orig: Point3::from_array(origin),
-            dir: Vec3::from_array(direct),
+            orig: Point3::new(origin),
+            dir: Vec3::new(direct),
         }
     }
 
@@ -34,7 +26,7 @@ impl Ray {
             orig: camera.origin,
             dir: Vec3::unit_vector(
                 camera.lower_left_corner
-                    + Vec3::from_array([
+                    + Vec3::new([
                         screen_coord.x() * camera.width,
                         screen_coord.y() * camera.height,
                         0.0,
@@ -49,7 +41,7 @@ impl Ray {
     pub fn origin(&self) -> Point3 {
         self.orig
     }
-    pub fn direct(&self) -> Vec3 {
+    pub fn direction(&self) -> Vec3 {
         self.dir
     }
 }

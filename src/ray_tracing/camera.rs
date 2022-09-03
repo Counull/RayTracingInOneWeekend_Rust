@@ -6,7 +6,7 @@ pub struct Camera {
     pub aspect_retio: f64,
     pub focal_lehgth: f64,
     pub origin: Vec3,
-    
+
     pub lower_left_corner: Vec3,
 }
 ///Constructor
@@ -18,11 +18,11 @@ impl Camera {
         origin: Option<Vec3>,
     ) -> Camera {
         let width = aspect_retio * height;
-        let horizontal = Vec3::from_array([width, 0.0, 0.0]);
-        let vertical = Vec3::from_array([0.0, height, 0.0]);
+        let horizontal = Vec3::new([width, 0.0, 0.0]);
+        let vertical = Vec3::new([0.0, height, 0.0]);
 
         let orig = match origin {
-            None => Vec3::new(),
+            None => Vec3::new([0.0, 0.0, 0.0]),
             Some(vec) => vec,
         };
 
@@ -32,7 +32,7 @@ impl Camera {
         };
 
         let lower_left_corner =
-            orig - horizontal / 2.0 - vertical / 2.0 - Vec3::from_array([0.0, 0.0, focal_lehgth]);
+            orig - horizontal / 2.0 - vertical / 2.0 - Vec3::new([0.0, 0.0, focal_lehgth]);
 
         Camera {
             width,
@@ -40,9 +40,8 @@ impl Camera {
             aspect_retio,
             focal_lehgth,
             origin: orig,
-           
+
             lower_left_corner,
-           
         }
     }
 }
