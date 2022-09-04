@@ -1,6 +1,6 @@
 use super::hittable::{HitRecord, Hittable};
-use super::ray::Ray;
 use crate::math_f64::vec3::{Point3, Vec3};
+use crate::ray_tracing::ray::Ray;
 
 pub struct Sphere {
     pub cneter: Point3,
@@ -55,9 +55,12 @@ impl Hittable for Sphere {
                 return false;
             }
         }
-        let outward_normal = (rec.p - self.cneter) / self.radius;
+   
     
-        rec.record_hit(root, r, outward_normal);
+      //  rec.record_hit(root, r, self);
+       let hit_point= r.at(root);
+        let outward_normal = (hit_point - self.cneter) / self.radius;
+        rec.record_hit1(root, hit_point, r.dir, outward_normal);
 
         return true;
     }

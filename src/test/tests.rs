@@ -1,8 +1,8 @@
 
 
-use crate::ray_tracing::hittable::{Hittable, HitRecord};
+use crate::model::hittable::{HitRecord, Hittable};
+use crate::model::sphere::Sphere;
 use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::sphere::Sphere;
 use crate::math_f64::vec3::{Vec3, Point3};
 
 
