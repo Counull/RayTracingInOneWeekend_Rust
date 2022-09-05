@@ -122,9 +122,9 @@ impl Vec3 {
     pub fn to_r8g8b8_string(&self) -> String {
         format!(
             "{} {} {}\n",
-            (256.0 * clamp(self.x(), 0.0, 0.999)) as i32,
-            (256.0 * clamp(self.y(), 0.0, 0.999)) as i32,
-            (256.0 * clamp(self.z(), 0.0, 0.999)) as i32
+            (256.0 * clamp(self.x().sqrt(), 0.0, 0.999)) as i32,
+            (256.0 * clamp(self.y().sqrt(), 0.0, 0.999)) as i32,
+            (256.0 * clamp(self.z().sqrt(), 0.0, 0.999)) as i32
         )
     }
 

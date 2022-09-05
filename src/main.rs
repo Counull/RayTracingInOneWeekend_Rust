@@ -58,11 +58,8 @@ fn main() {
                 s += 1;
             }
 
-            
-            let r = pix_color.x() * scale;
-            let g = pix_color.y() * scale;
-            let b = pix_color.z() * scale;
-            rgb_str.push_str(&Vec3::new([r, g, b]).to_r8g8b8_string());
+            pix_color*=scale;
+            rgb_str.push_str(& pix_color.to_r8g8b8_string());
             i += 1
         }
         j -= 1;
