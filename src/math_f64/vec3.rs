@@ -1,4 +1,6 @@
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub};
+
+use super::mathf64::clamp;
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec3 {
     pub e: [f64; 3],
@@ -13,6 +15,14 @@ impl Add for Vec3 {
         self.e[1] += add[1];
         self.e[2] += add[2];
         self
+    }
+}
+impl AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        let add = &rhs.e;
+        self.e[0] += add[0];
+        self.e[1] += add[1];
+        self.e[2] += add[2];
     }
 }
 
@@ -36,6 +46,14 @@ impl Mul<f64> for Vec3 {
         self.e[1] *= rhs;
         self.e[2] *= rhs;
         self
+    }
+}
+
+impl MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.e[0] *= rhs;
+        self.e[1] *= rhs;
+        self.e[2] *= rhs;
     }
 }
 
@@ -81,8 +99,8 @@ impl Vec3 {
         return Vec3 { e: array };
     }
 
-    pub fn empty() -> Vec3{
-        Vec3::new([0.0;3])
+    pub fn empty() -> Vec3 {
+        Vec3::new([0.0; 3])
     }
 }
 
@@ -106,9 +124,9 @@ impl Vec3 {
     pub fn to_r8g8b8_string(&self) -> String {
         format!(
             "{} {} {}\n",
-            (255.999 * self.x()) as i32,
-            (255.999 * self.y()) as i32,
-            (255.999 * self.z()) as i32
+            (256.0 * clamp(self.x(), 0.0, 0.999)) as i32,
+            (256.0 * clamp(self.y(), 0.0, 0.999)) as i32,
+            (256.0 * clamp(self.z(), 0.0, 0.999)) as i32
         )
     }
 

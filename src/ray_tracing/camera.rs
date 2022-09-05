@@ -1,5 +1,7 @@
 use crate::math_f64::vec3::Vec3;
 
+use super::ray::Ray;
+
 pub struct Camera {
     pub width: f64,
     pub height: f64,
@@ -8,6 +10,12 @@ pub struct Camera {
     pub origin: Vec3,
 
     pub lower_left_corner: Vec3,
+}
+
+impl Camera {
+  pub fn get_ray(&self, u:f64,v:f64)->Ray{
+        Ray ::from_camera(self, Vec3 ::new([u,v,0.0]))
+    }
 }
 ///Constructor
 impl Camera {
