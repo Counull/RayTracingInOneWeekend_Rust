@@ -9,7 +9,7 @@ pub struct Ray {
 ///Constructor
 impl Ray {
     pub fn new(orig: Point3, dir: Vec3) -> Self {
-        Self { orig, dir }
+        Self { orig:orig, dir :dir }
     }
 
     pub fn from_array(origin: [f64; 3], direct: [f64; 3]) -> Ray {
@@ -24,15 +24,15 @@ impl Ray {
     pub fn from_camera(camera: &Camera, screen_coord: Vec3) -> Ray {
         Ray {
             orig: camera.origin,
-            dir: Vec3::unit_vector(
-                camera.lower_left_corner
+            dir: 
+             camera.lower_left_corner
                     + Vec3::new([
                         screen_coord.x() * camera.width,
                         screen_coord.y() * camera.height,
                         0.0,
                     ])
                     - camera.origin,
-            ),
+            
         }
     }
 }

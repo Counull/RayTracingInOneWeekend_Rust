@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub};
 
-use super::mathf64::clamp;
+use super::mathf64::{clamp, random_f64, random_f64_01};
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec3 {
     pub e: [f64; 3],
@@ -10,19 +10,17 @@ impl Add for Vec3 {
     type Output = Self;
 
     fn add(mut self, rhs: Self) -> Self {
-        let add = &rhs.e;
-        self.e[0] += add[0];
-        self.e[1] += add[1];
-        self.e[2] += add[2];
+        self.e[0] += rhs.e[0];
+        self.e[1] += rhs.e[1];
+        self.e[2] += rhs.e[2];
         self
     }
 }
 impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
-        let add = &rhs.e;
-        self.e[0] += add[0];
-        self.e[1] += add[1];
-        self.e[2] += add[2];
+        self.e[0] += rhs.e[0];
+        self.e[1] += rhs.e[1];
+        self.e[2] += rhs.e[2];
     }
 }
 
@@ -138,7 +136,12 @@ impl Vec3 {
         return self.length_squared().sqrt();
     }
     pub fn unit_vector(v: Vec3) -> Vec3 {
-        v / v.length()
+        let length = v.length();
+        if length == 0.0 {
+            v
+        } else {
+            v / length
+        }
     }
     pub fn dot(u: Vec3, v: Vec3) -> f64 {
         u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2]
@@ -150,6 +153,28 @@ impl Vec3 {
             u.e[2] * v.e[0] - u.e[0] * v.e[2],
             u.e[0] * v.e[1] - u.e[1] * v.e[0],
         ])
+    }
+
+    pub fn random() -> Vec3 {
+        Vec3::new([random_f64_01(), random_f64_01(), random_f64_01()])
+    }
+    pub fn random_mm(min: f64, max: f64) -> Vec3 {
+        Vec3::new([
+            random_f64(min, max),
+            random_f64(min, max),
+            random_f64(min, max),
+        ])
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random_mm(-1.0, 1.0);
+            //这里的1很显然是1的平方
+            if p.length_squared() >= 1.0 {
+                continue;
+            }
+            return p;
+        }
     }
 }
 

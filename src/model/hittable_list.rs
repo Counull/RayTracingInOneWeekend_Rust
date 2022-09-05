@@ -31,7 +31,7 @@ impl HittableList {
     let mut hit_anything = false;
     let mut closesy_so_far=t_max;
 
-    for  object in self.objects.iter().as_ref(){
+    for  object in self.objects.iter(){
       if  object.hit(r, t_min, closesy_so_far, &mut temp_rec){
         hit_anything = true;
        hit_record.copy(& temp_rec) ;
