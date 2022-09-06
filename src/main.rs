@@ -17,10 +17,11 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
         return Color::empty();
     }
 
-    if world.hit(&r, 0.0, mathf64::infinity, &mut rec) {
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
-        return 0.5 * ray_color(Ray::new(rec.p+(rec.normal/10000.0), target - rec.p), world, depth - 1);
-    } 
+    if world.hit(&r, 0.001, mathf64::infinity, &mut rec) {
+        let target = rec.p + Vec3::random_in_unit_sphere_by_normal(rec.normal);
+        //在碰撞点上建立一个球体之后取随机方向，同时使这个随机值和法线在球体同一侧
+        return 0.5 * ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1);
+    }
 
     let unit_dir = Vec3::unit_vector(r.direction());
     let t = 0.5 * (unit_dir.y() + 1.0);
@@ -58,8 +59,8 @@ fn main() {
                 s += 1;
             }
 
-            pix_color*=scale;
-            rgb_str.push_str(& pix_color.to_r8g8b8_string());
+            pix_color *= scale;
+            rgb_str.push_str(&pix_color.to_r8g8b8_string());
             i += 1
         }
         j -= 1;
