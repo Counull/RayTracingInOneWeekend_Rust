@@ -57,8 +57,8 @@ fn main() {
 
     let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
     let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.7, 0.3, 0.3])));
-    let metal_left = Rc::new(Metal::new(Vec3::new([0.8, 0.8, 0.8])));
-    let metal_right=Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2])));
+    let metal_left = Rc::new(Metal::new(Vec3::new([0.8, 0.8, 0.8]),0.3));
+    let metal_right=Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]),1.0));
 
     world.add(Box::new(Sphere::new(
         Point3::new([0.0, 0.0, -1.0]),
