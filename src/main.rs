@@ -30,7 +30,7 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
                 return attenuation * ray_color(scattered, world, depth - 1);
             }
             None => {
-                //          print!("None mat Error");
+                          print!("None mat Error");
             }
         }
 
@@ -52,8 +52,8 @@ fn main() {
     let v1 = &Vec3::new([1.0, 1.0, 1.0]);
     let v2 = *v1;
 
-    let lambertian_mat = Rc::new(Lambertian::new(Vec3::new([0.5, 0.0, 0.0])));
-    let lambertian_mat1 = Rc::new(Lambertian::new(Vec3::new([0.5, 0.5, 0.5])));
+    let lambertian_mat = Rc::new(Lambertian::new(Vec3::new([0.9, 0.0, 0.0])));
+    let lambertian_mat1 = Rc::new(Lambertian::new(Vec3::new([0.9, 0.9, 0.9])));
 
     world.add(Box::new(Sphere::new(
         Point3::new([0.0, 0.0, -1.0]),
