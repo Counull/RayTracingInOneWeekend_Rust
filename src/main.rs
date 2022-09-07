@@ -10,7 +10,7 @@ use crate::math_f64::{
     mathf64::{random_f64, random_f64_01},
     vec3::{Color, Point3, Vec3},
 };
-use mat::lambertian::Lambertian;
+use mat::{lambertian::Lambertian, metal::Metal};
 use math_f64::mathf64::{self};
 use model::{hit_record::HitRecord, hittable_list::HittableList, sphere::Sphere};
 use ray_tracing::{camera::Camera, image::Image, ray::Ray};
@@ -26,8 +26,11 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
             Some(m) => {
                 let mut attenuation = Color::empty();
                 let mut scattered = Ray::empty();
-                m.scatter(&r, &rec, &mut attenuation, &mut scattered);
+              if m.scatter(&r, &rec, &mut attenuation, &mut scattered) {
                 return attenuation * ray_color(scattered, world, depth - 1);
+              }  
+              return Color::empty();
+              
             }
             None => {
                           print!("None mat Error");
@@ -52,19 +55,34 @@ fn main() {
     let v1 = &Vec3::new([1.0, 1.0, 1.0]);
     let v2 = *v1;
 
-    let lambertian_mat = Rc::new(Lambertian::new(Vec3::new([0.9, 0.0, 0.0])));
-    let lambertian_mat1 = Rc::new(Lambertian::new(Vec3::new([0.9, 0.9, 0.9])));
+    let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
+    let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.7, 0.3, 0.3])));
+    let metal_left = Rc::new(Metal::new(Vec3::new([0.8, 0.8, 0.8])));
+    let metal_right=Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2])));
 
     world.add(Box::new(Sphere::new(
         Point3::new([0.0, 0.0, -1.0]),
         0.5,
-        lambertian_mat.clone(),
+        lambertian_center.clone(),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new([0.0, -100.5, -1.0]),
         100.0,
-        lambertian_mat1.clone(),
+        lambertian_ground.clone(),
     )));
+    
+    world.add(Box::new(Sphere::new(
+        Point3::new([-1.0,0.0, -1.0]),
+        0.5,
+        metal_left.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new([1.0,0.0, -1.0]),
+        0.5,
+        metal_right.clone(),
+    )));
+    
+
 
     let sample_per_pixel = 100;
     let max_depth = 50;
