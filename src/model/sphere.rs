@@ -1,17 +1,24 @@
-use super::hittable::{HitRecord, Hittable};
+use std::borrow::Borrow;
+use std::rc::Rc;
+
+use super::hit_record::HitRecord;
+use super::hittable::TrHittable;
+use crate::mat::material::{self, TrMaterial};
 use crate::math_f64::vec3::{Point3, Vec3};
 use crate::ray_tracing::ray::Ray;
 
 pub struct Sphere {
     pub cneter: Point3,
     pub radius: f64,
+    pub mat:Rc<dyn TrMaterial>
 }
 
 ///Constructor
 impl Sphere {
-    pub fn new(cneter: Point3, radius: f64) -> Self {
-        Self { cneter, radius }
-    }
+    pub fn new(cneter: Point3, radius: f64, mat:  Rc<dyn TrMaterial>) -> Self { Self { cneter, radius, mat } }
+
+    
+    
 
     //实际上就是求一元二次方程是否有解
     fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
@@ -31,8 +38,8 @@ impl Sphere {
     }
 }
 
-impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64,   rec:  &mut HitRecord) -> bool {
+impl TrHittable for Sphere {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         let oc = r.origin() - self.cneter; //预先计算（A-C）
 
         //b^2-4ac
@@ -55,12 +62,12 @@ impl Hittable for Sphere {
                 return false;
             }
         }
-   
-    
-      //  rec.record_hit(root, r, self);
-       let hit_point= r.at(root);
+
+        //  rec.record_hit(root, r, self);
+        let hit_point = r.at(root);
         let outward_normal = (hit_point - self.cneter) / self.radius;
-        rec.record_hit1(root, hit_point, r.dir, outward_normal);
+   
+        rec.record_hit1(root, hit_point, r.dir,Some(self.mat.clone()) , outward_normal);
 
         return true;
     }

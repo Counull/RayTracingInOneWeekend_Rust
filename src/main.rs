@@ -1,14 +1,18 @@
+mod mat;
 mod math_f64;
 mod model;
 mod ray_tracing;
 mod test;
 mod utils;
+use std::rc::Rc;
+
 use crate::math_f64::{
     mathf64::{random_f64, random_f64_01},
     vec3::{Color, Point3, Vec3},
 };
+use mat::lambertian::Lambertian;
 use math_f64::mathf64::{self};
-use model::{hittable::HitRecord, hittable_list::HittableList, sphere::Sphere};
+use model::{hit_record::HitRecord, hittable_list::HittableList, sphere::Sphere};
 use ray_tracing::{camera::Camera, image::Image, ray::Ray};
 
 fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
@@ -18,9 +22,20 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     }
 
     if world.hit(&r, 0.001, mathf64::infinity, &mut rec) {
-        let target = rec.p + Vec3::random_in_unit_sphere_by_normal(rec.normal);
+        match &rec.mat {
+            Some(m) => {
+                let mut attenuation = Color::empty();
+                let mut scattered = Ray::empty();
+                m.scatter(&r, &rec, &mut attenuation, &mut scattered);
+                return attenuation * ray_color(scattered, world, depth - 1);
+            }
+            None => {
+                //          print!("None mat Error");
+            }
+        }
+
+        //   let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
         //在碰撞点上建立一个球体之后取随机方向，同时使这个随机值和法线在球体同一侧
-        return 0.5 * ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1);
     }
 
     let unit_dir = Vec3::unit_vector(r.direction());
@@ -33,10 +48,22 @@ fn main() {
     let image = Image::from_width(400, camera.aspect_retio);
 
     let mut world = HittableList::empty();
-    world.add(Box::new(Sphere::new(Point3::new([0.0, 0.0, -1.0]), 0.5)));
+
+    let v1 = &Vec3::new([1.0, 1.0, 1.0]);
+    let v2 = *v1;
+
+    let lambertian_mat = Rc::new(Lambertian::new(Vec3::new([0.5, 0.0, 0.0])));
+    let lambertian_mat1 = Rc::new(Lambertian::new(Vec3::new([0.5, 0.5, 0.5])));
+
+    world.add(Box::new(Sphere::new(
+        Point3::new([0.0, 0.0, -1.0]),
+        0.5,
+        lambertian_mat.clone(),
+    )));
     world.add(Box::new(Sphere::new(
         Point3::new([0.0, -100.5, -1.0]),
         100.0,
+        lambertian_mat1.clone(),
     )));
 
     let sample_per_pixel = 100;

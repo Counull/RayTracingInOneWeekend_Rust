@@ -36,6 +36,18 @@ impl Sub for Vec3 {
     }
 }
 
+impl Mul for Vec3 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self::new([
+            self.e[0] * rhs.e[0],
+            self.e[1] * rhs.e[1],
+            self.e[2] * rhs.e[2],
+        ])
+    }
+}
+
 impl Mul<f64> for Vec3 {
     type Output = Self;
 
@@ -166,8 +178,6 @@ impl Vec3 {
         ])
     }
 
-
-
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let p = Vec3::random_mm(-1.0, 1.0);
@@ -179,19 +189,23 @@ impl Vec3 {
         }
     }
 
-
-    pub fn random_unit_vector()->Vec3{
+    pub fn random_unit_vector() -> Vec3 {
         Self::unit_vector(Self::random_in_unit_sphere())
     }
 
-    pub fn random_in_unit_sphere_by_normal(normal:Vec3)->Vec3{ //
-       let in_unit_sphere = Vec3::random_in_unit_sphere();
-       if(Vec3::dot(in_unit_sphere, normal)>=0.0){
-        return in_unit_sphere;
-       }
-       return -in_unit_sphere;
+    pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
+        //
+        let in_unit_sphere = Vec3::random_in_unit_sphere();
+        if Vec3::dot(in_unit_sphere, normal) >= 0.0 {
+            return in_unit_sphere;
+        }
+        return -in_unit_sphere;
     }
 
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.e[0].abs() < 0.0 && self.e[1].abs() < 0.0 && self.e[2].abs() < 0.0
+    }
 }
 
 pub type Color = Vec3;
