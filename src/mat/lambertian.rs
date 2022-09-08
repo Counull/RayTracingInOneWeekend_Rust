@@ -15,7 +15,7 @@ impl TrMaterial for Lambertian {
         scatter_direction = rec.normal;
     }
     
-        *  scattered =  Ray::new(rec.p, scatter_direction);
+        * scattered =  Ray::new(rec.p, scatter_direction);
       * attenuation =  self.albedo;
      
             return true;

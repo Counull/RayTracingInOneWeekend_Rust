@@ -61,7 +61,7 @@ impl Mul<f64> for Vec3 {
 
 impl Mul<Vec3> for f64 {
     type Output = Vec3;
-    fn mul(self, rhs:Vec3) -> Vec3 {
+    fn mul(self, rhs: Vec3) -> Vec3 {
         rhs * self
     }
 }
@@ -73,8 +73,6 @@ impl MulAssign<f64> for Vec3 {
         self.e[2] *= rhs;
     }
 }
-
-
 
 impl Div<f64> for Vec3 {
     type Output = Self;
@@ -204,10 +202,19 @@ impl Vec3 {
         return -in_unit_sphere;
     }
 
-    pub fn reflect(&self ,normal:& Vec3) ->Vec3{
-        self.clone() - ( (2.0 * Vec3::dot(self.clone(),normal.clone())) * normal.clone()  )
+    pub fn reflect(&self, normal: &Vec3) -> Vec3 {
+        *self - ((2.0 * Vec3::dot(*self, *normal)) * *normal)
     }
 
+    pub fn refract(&self, &normal: &Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = Vec3::dot(-*self, normal).min(1.0);
+       
+        let r_out_prep = etai_over_etat * (*self + cos_theta * normal);
+        let r_out_parallel = -(1.0 - r_out_prep.length_squared()).abs().sqrt() * normal;
+        let refr = r_out_prep + r_out_parallel;
+
+        return refr;
+    }
 
     pub fn near_zero(&self) -> bool {
         let s = 1e-8;

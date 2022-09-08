@@ -10,7 +10,7 @@ use crate::math_f64::{
     mathf64::{random_f64, random_f64_01},
     vec3::{Color, Point3, Vec3},
 };
-use mat::{lambertian::Lambertian, metal::Metal};
+use mat::{dielectric::Dielectirc, lambertian::Lambertian, metal::Metal};
 use math_f64::mathf64::{self};
 use model::{hit_record::HitRecord, hittable_list::HittableList, sphere::Sphere};
 use ray_tracing::{camera::Camera, image::Image, ray::Ray};
@@ -26,14 +26,13 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
             Some(m) => {
                 let mut attenuation = Color::empty();
                 let mut scattered = Ray::empty();
-              if m.scatter(&r, &rec, &mut attenuation, &mut scattered) {
-                return attenuation * ray_color(scattered, world, depth - 1);
-              }  
-              return Color::empty();
-              
+                if m.scatter(&r, &rec, &mut attenuation, &mut scattered) {
+                    return attenuation * ray_color(scattered, world, depth - 1);
+                }
+                return Color::empty();
             }
             None => {
-                          print!("None mat Error");
+                print!("None mat Error");
             }
         }
 
@@ -52,13 +51,12 @@ fn main() {
 
     let mut world = HittableList::empty();
 
-    let v1 = &Vec3::new([1.0, 1.0, 1.0]);
-    let v2 = *v1;
+   
 
-    let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
-    let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.7, 0.3, 0.3])));
-    let metal_left = Rc::new(Metal::new(Vec3::new([0.8, 0.8, 0.8]),0.3));
-    let metal_right=Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]),1.0));
+    let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
+    let lambertian_center = Rc::new(Dielectirc::new(1.5));
+    let metal_left = Rc::new(Dielectirc::new(1.5));
+    let metal_right = Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]), 1.0));
 
     world.add(Box::new(Sphere::new(
         Point3::new([0.0, 0.0, -1.0]),
@@ -70,19 +68,17 @@ fn main() {
         100.0,
         lambertian_ground.clone(),
     )));
-    
+
     world.add(Box::new(Sphere::new(
-        Point3::new([-1.0,0.0, -1.0]),
+        Point3::new([-1.0, 0.0, -1.0]),
         0.5,
         metal_left.clone(),
     )));
     world.add(Box::new(Sphere::new(
-        Point3::new([1.0,0.0, -1.0]),
+        Point3::new([1.0, 0.0, -1.0]),
         0.5,
         metal_right.clone(),
     )));
-    
-
 
     let sample_per_pixel = 100;
     let max_depth = 50;
