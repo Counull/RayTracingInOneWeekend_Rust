@@ -170,7 +170,7 @@ impl Vec3 {
     pub fn random() -> Vec3 {
         Vec3::new([random_f64_01(), random_f64_01(), random_f64_01()])
     }
-    pub fn random_mm(min: f64, max: f64) -> Vec3 {
+    pub fn random_min_max(min: f64, max: f64) -> Vec3 {
         Vec3::new([
             random_f64(min, max),
             random_f64(min, max),
@@ -180,7 +180,7 @@ impl Vec3 {
 
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
-            let p = Vec3::random_mm(-1.0, 1.0);
+            let p = Vec3::random_min_max(-1.0, 1.0);
             //这里的1很显然是1的平方
             if p.length_squared() >= 1.0 {
                 continue;

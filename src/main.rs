@@ -4,20 +4,86 @@ mod model;
 mod ray_tracing;
 mod test;
 mod utils;
-use std::rc::Rc;
-
 use crate::math_f64::{
     mathf64::{random_f64, random_f64_01},
     vec3::{Color, Point3, Vec3},
 };
 use mat::{dielectric::Dielectirc, lambertian::Lambertian, metal::Metal};
 use math_f64::mathf64::{self, PI};
-use model::{hit_record::HitRecord, hittable_list::HittableList, sphere::Sphere};
+use model::{
+    hit_record::HitRecord,
+    hittable_list::{self, HittableList},
+    sphere::Sphere,
+};
 use ray_tracing::{
     camera::{self, Camera},
     image::Image,
     ray::Ray,
 };
+use std::rc::Rc;
+use std::time::{Duration, SystemTime};
+fn random_scence() -> HittableList {
+    let mut world = HittableList::empty();
+
+    let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.5, 0.5, 0.5])));
+
+    world.add(Box::new(Sphere::new(
+        Point3::new([0., -1000., 0.]),
+        1000.,
+        lambertian_ground.clone(),
+    ))); //ground
+
+    //Big Ball
+    let glass_mat = Rc::new(Dielectirc::new(1.5));
+    let diffuse_mat = Rc::new(Lambertian::new(Vec3::new([0.4, 0.2, 0.1])));
+    let metal_mat = Rc::new(Metal::new(Vec3::new([0.7, 0.6, 0.5]), 0.));
+    world.add(Box::new(Sphere::new(
+        Point3::new([0., 1., 0.]),
+        1.,
+        glass_mat,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new([-4., 1., 0.]),
+        1.,
+        diffuse_mat,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new([4., 1., 0.]),
+        1.,
+        metal_mat,
+    )));
+
+    for a in -11..10 {
+        for b in -11..10 {
+            let choose_mat = random_f64_01();
+            let center = Point3::new([
+                a as f64 + 0.9 * random_f64_01(),
+                0.2,
+                b as f64 + 0.9 * random_f64_01(),
+            ]);
+            if (center - Point3::new([4., 0.2, 0.])).length() > 0.9 {
+                if choose_mat < 0.77 {
+                    //diffuse
+                    let albedo = Color::random() * Color::random();
+                    let mat = Rc::new(Lambertian::new(albedo));
+                    world.add(Box::new(Sphere::new(center, 0.2, mat)));
+                } else if choose_mat < 0.92 {
+                    //metal
+                    let albedo = Color::random_min_max(0.5, 1.);
+                    let fuzz = random_f64(0., 0.5);
+                    let mat = Rc::new(Metal::new(albedo, fuzz));
+                    world.add(Box::new(Sphere::new(center, 0.2, mat)));
+                } else {
+                    //glass
+                    let mat = Rc::new(Dielectirc::new(1.5));
+                    world.add(Box::new(Sphere::new(center, 0.2, mat)));
+                }
+            }
+        }
+    }
+
+    return world;
+}
 
 fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     let mut rec = HitRecord::empty();
@@ -50,60 +116,35 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
 }
 
 fn main() {
+    let sy_time = SystemTime::now();
+    let world = random_scence();
+    println!(
+        "Generate scenct done:{:?}",
+        SystemTime::now()
+            .duration_since(sy_time)
+            .unwrap()
+            .as_millis()
+    );
+
     // let camera = Camera::new(2.0, 16.0 / 9.0, None, None);
-    let lookfrom = Point3::new([3., 3., 2.]);
-    let lookat = Point3::new([0., 0., -1.]);
-    let dist_to_focus = (lookfrom - lookat).length() ;
+    let lookfrom = Point3::new([13., 2., 3.]);
+    let lookat = Point3::new([0., 0., 0.]);
     let camera = Camera::new(
         20.0,
-        16.0 / 9.0,
-        2.0,
-        dist_to_focus,
+        3.0 / 2.0,
+        0.1,
+        10.0,
         Some(lookfrom),
         Some(lookat),
         None,
     );
-    let image = Image::from_width(400, camera.aspect_retio);
+    let image = Image::from_width(1200, camera.aspect_retio);
 
-    let mut world = HittableList::empty();
-
-    let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
-    let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.1, 0.2, 0.5])));
-    let metal_left = Rc::new(Dielectirc::new(1.5));
-    let metal_right = Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]), 0.0));
-
-    world.add(Box::new(Sphere::new(
-        Point3::new([0., -100.5, -1.0]),
-        100.,
-        lambertian_ground.clone(),
-    ))); //ground
-    world.add(Box::new(Sphere::new(
-        Point3::new([0., 0.0, -1.0]),
-        0.5,
-        lambertian_center.clone(),
-    ))); //center
-
-    world.add(Box::new(Sphere::new(
-        Point3::new([1.0, 0.0, -1.0]),
-        0.5,
-        metal_right.clone(),
-    ))); //right
-
-    world.add(Box::new(Sphere::new(
-        Point3::new([-1.0, 0.0, -1.0]),
-        0.5,
-        metal_left.clone(),
-    ))); //left
-    world.add(Box::new(Sphere::new(
-        Point3::new([-1.0, 0.0, -1.0]),
-        -0.45,
-        metal_left.clone(),
-    ))); //in left
-
-    let sample_per_pixel = 100;
-    let max_depth = 50;
+    let sample_per_pixel = 501;
+    let max_depth = 52;
     let mut rgb_str = String::new();
     let scale = 1.0 / sample_per_pixel as f64;
+
     let mut j = image.height - 1;
     while j >= 0 {
         println!("Scanlines remaining:{}", j);
@@ -126,5 +167,20 @@ fn main() {
         }
         j -= 1;
     }
+    println!(
+        "Ray trace done:{:?}",
+        SystemTime::now()
+            .duration_since(sy_time)
+            .unwrap()
+            .as_secs_f64()
+    );
+
     image.generate_image("image/result.ppm", rgb_str);
+    println!(
+        "Generate image done:{:?}",
+        SystemTime::now()
+            .duration_since(sy_time)
+            .unwrap()
+            .as_secs_f64()
+    );
 }
