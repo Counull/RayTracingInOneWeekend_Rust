@@ -48,45 +48,48 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
  fn main() {
    // let camera = Camera::new(2.0, 16.0 / 9.0, None, None);
 
-   let camera = Camera::from_fov(90.0, 16.0/9.0, None, None,None);
+   let camera = Camera::from_fov(90.0, 16.0/9.0, Some(Point3::new([-2.,2.,1.])), Some(Point3::new([0.,0.,-1.])),None);
    let image = Image::from_width(400, camera.aspect_retio);
 
-   let R = (PI/4.0).cos();
-   let metal_left = Rc::new(Lambertian::new(Vec3::new([0.0, 0.0, 1.0])));
-   let metal_right =Rc::new(Lambertian::new(Vec3::new([1.0, 0.0, 0.0])));
-
+  
 
 
     let mut world = HittableList::empty();
 
- //   let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
-  //  let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.1, 0.2, 0.5])));
-   // let metal_left = Rc::new(Dielectirc::new(1.5));
-   // let metal_right = Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]), 0.0));
+   let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
+   let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.1, 0.2, 0.5])));
+   let metal_left = Rc::new(Dielectirc::new(1.5));
+    let metal_right = Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]), 0.0));
 
   
+    world.add(Box::new(Sphere::new(
+        Point3::new([0., -100.5, -1.0]),
+        100.,
+        lambertian_ground.clone(),
+    ))); //ground
+    world.add(Box::new(Sphere::new(
+        Point3::new([0., 0.0, -1.0]),
+        0.5,
+        lambertian_center.clone(),
+    ))); //center
 
- /*    world.add(Box::new(Sphere::new(
+    world.add(Box::new(Sphere::new(
+        Point3::new([1.0, 0.0, -1.0]),
+        0.5,
+        metal_right.clone(),
+    ))); //right
+
+    world.add(Box::new(Sphere::new(
         Point3::new([-1.0, 0.0, -1.0]),
         0.5,
         metal_left.clone(),
     ))); //left
     world.add(Box::new(Sphere::new(
         Point3::new([-1.0, 0.0, -1.0]),
-        -0.4,
+        -0.45,
         metal_left.clone(),
-    ))); //in left */
-    world.add(Box::new(Sphere::new(
-        Point3::new([-R, 0.0, -1.0]),
-        R,
-        metal_left.clone(),
-    ))); //left
-
-    world.add(Box::new(Sphere::new(
-        Point3::new([R, 0.0, -1.0]),
-        R,
-        metal_right.clone(),
-    ))); //right
+    ))); //in left 
+   
 
     let sample_per_pixel = 100;
     let max_depth = 50;
