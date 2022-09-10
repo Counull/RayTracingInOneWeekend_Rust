@@ -33,12 +33,15 @@ impl Ray {
     ///program screen_coord: just use .x() and .y()
     ///这个函数是否需要存在？因为这里所以需要的变量其实多数属于Camera，这个函数的归属权应是Camera
     pub fn from_camera(camera: &Camera, screen_coord: Vec3) -> Ray {
+        let rd = camera.lens_radius * Vec3::ramdom_in_unit_disk(); //景深 焦散
+        let offset = camera.u * rd.x() + camera.v * rd.y();
         Ray {
-            orig: camera.origin,
+            orig: camera.lookfrom + offset,
             dir: camera.lower_left_corner
                 + screen_coord.x() * camera.horizontal
                 + screen_coord.y() * camera.vertical
-                - camera.origin,
+                - camera.lookfrom
+                - offset,
         }
     }
 }

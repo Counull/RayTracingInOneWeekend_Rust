@@ -202,20 +202,29 @@ impl Vec3 {
         return -in_unit_sphere;
     }
 
+    pub fn ramdom_in_unit_disk() -> Vec3 {
+        loop {
+            let p = Vec3::new([random_f64(-1., 1.), random_f64(-1., 1.), 0.]);
+            if p.length_squared() >= 1. {
+                continue;
+            }
+            return p;
+        }
+    }
+
     pub fn reflect(&self, normal: &Vec3) -> Vec3 {
         *self - ((2.0 * Vec3::dot(*self, *normal)) * *normal)
     }
 
     pub fn refract(&self, &normal: &Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = Vec3::dot(-*self, normal).min(1.0);
-     
+
         let r_out_prep = etai_over_etat * (*self + cos_theta * normal);
-    
+
         let r_out_parallel = -(1.0 - r_out_prep.length_squared()).abs().sqrt() * normal;
-    
+
         let refr = r_out_prep + r_out_parallel;
 
-  
         return refr;
     }
 

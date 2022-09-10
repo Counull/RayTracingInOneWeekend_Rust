@@ -51,12 +51,16 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
 
 fn main() {
     // let camera = Camera::new(2.0, 16.0 / 9.0, None, None);
-
-    let camera = Camera::from_fov(
+    let lookfrom = Point3::new([3., 3., 2.]);
+    let lookat = Point3::new([0., 0., -1.]);
+    let dist_to_focus = (lookfrom - lookat).length() ;
+    let camera = Camera::new(
         20.0,
         16.0 / 9.0,
-        Some(Point3::new([-2., 2., 1.])),
-        Some(Point3::new([0., 0., -1.])),
+        2.0,
+        dist_to_focus,
+        Some(lookfrom),
+        Some(lookat),
         None,
     );
     let image = Image::from_width(400, camera.aspect_retio);
