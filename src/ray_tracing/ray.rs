@@ -31,15 +31,13 @@ impl Ray {
 
     ///Generate ray from camera to screen coordinate
     ///program screen_coord: just use .x() and .y()
+    ///这个函数是否需要存在？因为这里所以需要的变量其实多数属于Camera，这个函数的归属权应是Camera
     pub fn from_camera(camera: &Camera, screen_coord: Vec3) -> Ray {
         Ray {
             orig: camera.origin,
             dir: camera.lower_left_corner
-                + Vec3::new([
-                    screen_coord.x() * camera.width,
-                    screen_coord.y() * camera.height,
-                    0.0,
-                ])
+                + screen_coord.x() * camera.horizontal
+                + screen_coord.y() * camera.vertical
                 - camera.origin,
         }
     }
