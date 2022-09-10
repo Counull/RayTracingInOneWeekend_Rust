@@ -10,7 +10,7 @@ use super::material::TrMaterial;
 
 ///always refraction
 pub struct Dielectirc {
-    pub ir: f64, //refraction ratio
+    pub ir: f64, // Index of Refraction
 }
 
 impl Dielectirc {
@@ -21,6 +21,7 @@ impl Dielectirc {
 
 impl Dielectirc {
     fn refectance(cosinen: f64, ref_idx: f64) -> f64 {
+         // Use Schlick's approximation for reflectance.
         let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
         r0 *= r0;
         return r0 + (1.0 - r0) * (1.0 - cosinen).powf(5.0);

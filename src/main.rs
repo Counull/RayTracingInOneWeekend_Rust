@@ -11,9 +11,9 @@ use crate::math_f64::{
     vec3::{Color, Point3, Vec3},
 };
 use mat::{dielectric::Dielectirc, lambertian::Lambertian, metal::Metal};
-use math_f64::mathf64::{self};
+use math_f64::mathf64::{self, PI};
 use model::{hit_record::HitRecord, hittable_list::HittableList, sphere::Sphere};
-use ray_tracing::{camera::Camera, image::Image, ray::Ray};
+use ray_tracing::{camera::{Camera, self}, image::Image, ray::Ray};
 
 fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     let mut rec = HitRecord::empty();
@@ -21,7 +21,7 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
         return Color::empty();
     }
 
-    if world.hit(&r, 0.001, mathf64::infinity, &mut rec) {
+    if world.hit(&r, 0.001, mathf64::INFINITY, &mut rec) {
         match &rec.mat {
             Some(m) => {
                 let mut attenuation = Color::empty();
@@ -45,29 +45,28 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     (1.0 - t) * Color::new([1.0, 1.0, 1.0]) + t * Color::new([0.5, 0.7, 1.0])
 }
 
-fn main() {
-    let camera = Camera::new(2.0, 16.0 / 9.0, None, None);
-    let image = Image::from_width(400, camera.aspect_retio);
+ fn main() {
+   // let camera = Camera::new(2.0, 16.0 / 9.0, None, None);
+
+   let camera = Camera::from_fov(90.0, 16.0/9.0, None, None);
+   let image = Image::from_width(400, camera.aspect_retio);
+
+   let R = (PI/4.0).cos();
+   let metal_left = Rc::new(Lambertian::new(Vec3::new([0.0, 0.0, 1.0])));
+   let metal_right =Rc::new(Lambertian::new(Vec3::new([1.0, 0.0, 0.0])));
+
+
 
     let mut world = HittableList::empty();
 
-    let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
-    let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.1, 0.2, 0.5])));
-    let metal_left = Rc::new(Dielectirc::new(1.5));
-    let metal_right = Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]), 0.0));
+ //   let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
+  //  let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.1, 0.2, 0.5])));
+   // let metal_left = Rc::new(Dielectirc::new(1.5));
+   // let metal_right = Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]), 0.0));
 
-    world.add(Box::new(Sphere::new(
-        Point3::new([0.0, 0.0, -1.0]),
-        0.5,
-        lambertian_center.clone(),
-    ))); //center
-    world.add(Box::new(Sphere::new(
-        Point3::new([0.0, -100.5, -1.0]),
-        100.0,
-        lambertian_ground.clone(),
-    ))); //ground
+  
 
-    world.add(Box::new(Sphere::new(
+ /*    world.add(Box::new(Sphere::new(
         Point3::new([-1.0, 0.0, -1.0]),
         0.5,
         metal_left.clone(),
@@ -76,11 +75,16 @@ fn main() {
         Point3::new([-1.0, 0.0, -1.0]),
         -0.4,
         metal_left.clone(),
-    ))); //in left
+    ))); //in left */
+    world.add(Box::new(Sphere::new(
+        Point3::new([-R, 0.0, -1.0]),
+        R,
+        metal_left.clone(),
+    ))); //left
 
     world.add(Box::new(Sphere::new(
-        Point3::new([1.0, 0.0, -1.0]),
-        0.5,
+        Point3::new([R, 0.0, -1.0]),
+        R,
         metal_right.clone(),
     ))); //right
 
@@ -112,3 +116,4 @@ fn main() {
     }
     image.generate_image("image/result.ppm", rgb_str);
 }
+ 
