@@ -13,7 +13,11 @@ use crate::math_f64::{
 use mat::{dielectric::Dielectirc, lambertian::Lambertian, metal::Metal};
 use math_f64::mathf64::{self, PI};
 use model::{hit_record::HitRecord, hittable_list::HittableList, sphere::Sphere};
-use ray_tracing::{camera::{Camera, self}, image::Image, ray::Ray};
+use ray_tracing::{
+    camera::{self, Camera},
+    image::Image,
+    ray::Ray,
+};
 
 fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     let mut rec = HitRecord::empty();
@@ -45,23 +49,25 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     (1.0 - t) * Color::new([1.0, 1.0, 1.0]) + t * Color::new([0.5, 0.7, 1.0])
 }
 
- fn main() {
-   // let camera = Camera::new(2.0, 16.0 / 9.0, None, None);
+fn main() {
+    // let camera = Camera::new(2.0, 16.0 / 9.0, None, None);
 
-   let camera = Camera::from_fov(90.0, 16.0/9.0, Some(Point3::new([-2.,2.,1.])), Some(Point3::new([0.,0.,-1.])),None);
-   let image = Image::from_width(400, camera.aspect_retio);
-
-  
-
+    let camera = Camera::from_fov(
+        20.0,
+        16.0 / 9.0,
+        Some(Point3::new([-2., 2., 1.])),
+        Some(Point3::new([0., 0., -1.])),
+        None,
+    );
+    let image = Image::from_width(400, camera.aspect_retio);
 
     let mut world = HittableList::empty();
 
-   let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
-   let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.1, 0.2, 0.5])));
-   let metal_left = Rc::new(Dielectirc::new(1.5));
+    let lambertian_ground = Rc::new(Lambertian::new(Vec3::new([0.8, 0.8, 0.0])));
+    let lambertian_center = Rc::new(Lambertian::new(Vec3::new([0.1, 0.2, 0.5])));
+    let metal_left = Rc::new(Dielectirc::new(1.5));
     let metal_right = Rc::new(Metal::new(Vec3::new([0.8, 0.6, 0.2]), 0.0));
 
-  
     world.add(Box::new(Sphere::new(
         Point3::new([0., -100.5, -1.0]),
         100.,
@@ -88,8 +94,7 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
         Point3::new([-1.0, 0.0, -1.0]),
         -0.45,
         metal_left.clone(),
-    ))); //in left 
-   
+    ))); //in left
 
     let sample_per_pixel = 100;
     let max_depth = 50;
@@ -119,4 +124,3 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     }
     image.generate_image("image/result.ppm", rgb_str);
 }
- 
