@@ -55,19 +55,19 @@ fn random_scence() -> HittableList {
 
     for a in -11..10 {
         for b in -11..10 {
-            let choose_mat = random_f64_01();
             let center = Point3::new([
                 a as f64 + 0.9 * random_f64_01(),
                 0.2,
                 b as f64 + 0.9 * random_f64_01(),
             ]);
             if (center - Point3::new([4., 0.2, 0.])).length() > 0.9 {
-                if choose_mat < 0.77 {
+                let choose_mat = random_f64_01();
+                if choose_mat < 0.70 {
                     //diffuse
                     let albedo = Color::random() * Color::random();
                     let mat = Rc::new(Lambertian::new(albedo));
                     world.add(Box::new(Sphere::new(center, 0.2, mat)));
-                } else if choose_mat < 0.92 {
+                } else if choose_mat < 0.87 {
                     //metal
                     let albedo = Color::random_min_max(0.5, 1.);
                     let fuzz = random_f64(0., 0.5);
@@ -140,14 +140,21 @@ fn main() {
     );
     let image = Image::from_width(1200, camera.aspect_retio);
 
-    let sample_per_pixel = 501;
-    let max_depth = 52;
+    let sample_per_pixel = 510;
+    let max_depth = 55;
     let mut rgb_str = String::new();
     let scale = 1.0 / sample_per_pixel as f64;
 
     let mut j = image.height - 1;
     while j >= 0 {
-        println!("Scanlines remaining:{}", j);
+        println!(
+            "Scanlines remaining:{} ,{:?}",
+            j,
+            SystemTime::now()
+                .duration_since(sy_time)
+                .unwrap()
+                .as_secs_f64()
+        );
         let mut i = 0;
         while i < image.width {
             let mut pix_color = Vec3::empty();
