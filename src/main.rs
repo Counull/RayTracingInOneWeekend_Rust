@@ -116,6 +116,9 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
 }
 
 fn main() {
+
+   
+
     let sy_time = SystemTime::now();
     let world = random_scence();
     println!(

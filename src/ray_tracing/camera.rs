@@ -76,6 +76,6 @@ impl Camera {
 
 impl Camera {
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
-        Ray::from_camera(self, Vec3::new([u, v, 0.0]))
+        Ray::from_camera(self, Vec3::new([u, v, 0.0]),None)
     }
 }

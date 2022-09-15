@@ -7,7 +7,7 @@ use crate::ray_tracing::ray::Ray;
 pub fn test_record() {
    // let sphere = Sphere::new(Point3::new([0.0, 0.0, -1.0]), 0.5);
 
-    let ray = Ray::new(Vec3::new([0.0; 3]), Point3::new([0.0, 0.0, -1.0]));
+    let ray = Ray::new(Vec3::new([0.0; 3]), Point3::new([0.0, 0.0, -1.0]),None);
     let mut rec = HitRecord::empty();
  //   sphere.hit(&ray, 0.5, 0.5, &mut rec);
 }
