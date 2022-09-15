@@ -1,5 +1,5 @@
 use crate::math_f64::{
-    mathf64::degrees_to_radians,
+    mathf64::{degrees_to_radians, random_f64},
     vec3::{Point3, Vec3},
 };
 
@@ -15,6 +15,8 @@ pub struct Camera {
     pub w: Vec3,
     pub aspect_retio: f64,
     pub lens_radius: f64,
+    pub time0: f64,
+    pub time1: f64,
 }
 
 ///Constructor
@@ -27,6 +29,8 @@ impl Camera {
         aspect_retio: f64,
         apertrue: f64,
         focus_dist: f64,
+        time0: f64,
+        time1: f64,
         lookfrom: Option<Vec3>,
         lookat: Option<Point3>,
         vup: Option<Point3>,
@@ -65,6 +69,8 @@ impl Camera {
             vertical,
             lookfrom,
             lower_left_corner,
+            time0,
+            time1,
             u,
             v,
             w,
@@ -76,6 +82,10 @@ impl Camera {
 
 impl Camera {
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
-        Ray::from_camera(self, Vec3::new([u, v, 0.0]))
+        Ray::from_camera(
+            self,
+            Vec3::new([u, v, 0.0]),
+            Some(random_f64(self.time0, self.time1)),
+        )
     }
 }

@@ -1,49 +1,52 @@
-use std::borrow::Borrow;
 use std::rc::Rc;
 
-use super::hit_record::HitRecord;
-use super::hittable::TrHittable;
-use crate::mat::material::{self, TrMaterial};
-use crate::math_f64::vec3::{Point3, Vec3};
-use crate::ray_tracing::ray::Ray;
+use crate::{
+    mat::material::TrMaterial,
+    math_f64::vec3::{Point3, Vec3},
+    ray_tracing::ray::Ray,
+};
 
-pub struct Sphere {
+use super::{hit_record::HitRecord, hittable::TrHittable};
+
+pub struct MoveSphere {
+    pub time0: f64,
+    pub time1: f64,
     pub radius: f64,
-    pub cneter: Point3,
+    pub cneter0: Point3,
+    pub cneter1: Point3,
     pub mat: Rc<dyn TrMaterial>,
 }
 
-///Constructor
-impl Sphere {
-    pub fn new(cneter: Point3, radius: f64, mat: Rc<dyn TrMaterial>) -> Self {
+impl MoveSphere {
+    pub fn new(
+        cneter0: Point3,
+        cneter1: Point3,
+        time0: f64,
+        time1: f64,
+        radius: f64,
+        mat: Rc<dyn TrMaterial>,
+    ) -> Self {
         Self {
-            cneter,
+            time0,
+            time1,
             radius,
+            cneter0,
+            cneter1,
             mat,
         }
     }
-
-    //实际上就是求一元二次方程是否有解
-    fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
-        let oc = ray.origin() - *center; //预先计算（A-C）
-
-        //b^2-4ac
-        let a = ray.dir.length_squared();
-        let half_b = Vec3::dot(ray.dir, oc);
-        let c = oc.length_squared() - radius * radius;
-        let discriminant = half_b * half_b - a * c; //b^2-4ac
-
-        if discriminant < 0.0 {
-            return -1.0;
-        }
-
-        return (-half_b - discriminant.sqrt()) / a;
+}
+impl MoveSphere {
+    pub fn center(&self, time: f64) -> Point3 {
+        self.cneter0
+            + ((time - self.time0) / (self.time1 - self.time0)) * (self.cneter1 - self.cneter0)
     }
 }
 
-impl TrHittable for Sphere {
+impl TrHittable for MoveSphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let oc = r.origin() - self.cneter; //预先计算（A-C）
+        let current_center = self.center(r.time);
+        let oc = r.origin() - current_center; //预先计算（A-C）
 
         //b^2-4ac
         let a = r.dir.length_squared();
@@ -68,7 +71,7 @@ impl TrHittable for Sphere {
 
         //  rec.record_hit(root, r, self);
         let hit_point = r.at(root);
-        let outward_normal = (hit_point - self.cneter) / self.radius;
+        let outward_normal = (hit_point - current_center) / self.radius;
 
         rec.record_hit1(
             root,

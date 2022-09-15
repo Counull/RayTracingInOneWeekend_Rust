@@ -55,7 +55,7 @@ impl TrMaterial for Dielectirc {
             unit_direction.refract(&rec.normal, refraction_ratio)
         };
 
-        *scattered = Ray::new(rec.p, direction);
+        *scattered = Ray::new(rec.p, direction,Some(ray_in.time));
 
         /*   let refracted = unit_direction.refract(&rec.normal, refraction_ratio);
          *scattered =  Ray::new(rec.p, refracted); */
