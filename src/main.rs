@@ -9,19 +9,11 @@ use crate::math_f64::{
     vec3::{Color, Point3, Vec3},
 };
 use mat::{dielectric::Dielectirc, lambertian::Lambertian, metal::Metal};
-use math_f64::mathf64::{self, PI};
-use model::{
-    hit_record::HitRecord,
-    hittable_list::{self, HittableList},
-    sphere::Sphere,
-};
-use ray_tracing::{
-    camera::{self, Camera},
-    image::Image,
-    ray::Ray,
-};
+use math_f64::mathf64::{self};
+use model::{hit_record::HitRecord, hittable_list::HittableList, sphere::Sphere, moving_sphere::MoveSphere};
+use ray_tracing::{camera::Camera, image::Image, ray::Ray};
 use std::rc::Rc;
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 fn random_scence() -> HittableList {
     let mut world = HittableList::empty();
 
@@ -66,7 +58,8 @@ fn random_scence() -> HittableList {
                     //diffuse
                     let albedo = Color::random() * Color::random();
                     let mat = Rc::new(Lambertian::new(albedo));
-                    world.add(Box::new(Sphere::new(center, 0.2, mat)));
+                    let center2=center+Vec3::new([0.0,random_f64(0., 0.5),0.0]);
+                    world.add(Box::new(MoveSphere::new(center,center2,0.0,1.0, 0.2, mat)));
                 } else if choose_mat < 0.87 {
                     //metal
                     let albedo = Color::random_min_max(0.5, 1.);
@@ -116,9 +109,6 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
 }
 
 fn main() {
-
-   
-
     let sy_time = SystemTime::now();
     let world = random_scence();
     println!(
@@ -134,17 +124,20 @@ fn main() {
     let lookat = Point3::new([0., 0., 0.]);
     let camera = Camera::new(
         20.0,
-        3.0 / 2.0,
+        16./9.,
         0.1,
         10.0,
+        0.,
+        1.,
         Some(lookfrom),
         Some(lookat),
         None,
     );
-    let image = Image::from_width(1200, camera.aspect_retio);
+    let image = Image::from_width(400, camera.aspect_retio);
 
-    let sample_per_pixel = 510;
-    let max_depth = 55;
+    let sample_per_pixel = 100;
+    let max_depth = 50;
+
     let mut rgb_str = String::new();
     let scale = 1.0 / sample_per_pixel as f64;
 

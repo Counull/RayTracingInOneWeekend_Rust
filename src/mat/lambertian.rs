@@ -8,14 +8,14 @@ albedo:Color
 }
 
 impl TrMaterial for Lambertian {
-    fn scatter( & self,ray: &Ray, rec: &HitRecord, attenuation: &mut Color, scattered: &mut Ray) -> bool {
+    fn scatter( & self,ray_in: &Ray, rec: &HitRecord, attenuation: &mut Color, scattered: &mut Ray) -> bool {
         let mut scatter_direction=rec.normal+Vec3::random_unit_vector();
     
     if scatter_direction.near_zero() {
         scatter_direction = rec.normal;
     }
     
-        * scattered =  Ray::new(rec.p, scatter_direction,None);
+        * scattered =  Ray::new(rec.p, scatter_direction,Some(ray_in.time));
       * attenuation =  self.albedo;
      
             return true;

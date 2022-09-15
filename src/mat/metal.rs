@@ -22,13 +22,13 @@ impl Metal {
 impl TrMaterial for Metal {
     fn scatter(
         &self,
-        ray: &crate::ray_tracing::ray::Ray,
+        ray_in: &crate::ray_tracing::ray::Ray,
         rec: &crate::model::hit_record::HitRecord,
         attenuation: &mut Color,
         scattered: &mut crate::ray_tracing::ray::Ray,
     ) -> bool {
-        let reflected = Vec3::unit_vector(ray.direction()).reflect(&rec.normal);
-        *scattered = Ray::new(rec.p, reflected + self.fuzz * Vec3::random_in_unit_sphere(),None);
+        let reflected = Vec3::unit_vector(ray_in.direction()).reflect(&rec.normal);
+        *scattered = Ray::new(rec.p, reflected + self.fuzz * Vec3::random_in_unit_sphere(),Some(ray_in.time));
         *attenuation = self.albedo;
         Vec3::dot(scattered.direction(), rec.normal) > 0.0
     }
